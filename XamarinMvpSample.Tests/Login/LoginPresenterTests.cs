@@ -31,6 +31,24 @@ namespace XamarinMvpSample.Tests
 		}
 
 		[Test]
+		public async Task TestWaitingCallbackWithMoq()
+		{
+			Assert.False(_view.Waiting);
+
+			Mock<ILoginView> mockView = new Mock<ILoginView>();
+
+			_presenter = new LoginPresenter(mockView.Object, _mockInteractor.Object);
+
+			_presenter.UpdateUsername("User");
+			_presenter.UpdatePassword("Pass");
+
+			await _presenter.Login();
+
+			mockView.Verify(view => view.OnWaiting(), Times.Once());
+			mockView.Verify(view => view.OnStopWaiting(), Times.Once());
+		}
+
+		[Test]
 		public async Task TestWaitingCallback()
 		{
 			//Interactor will return after a delay (our asserts will happen while waiting for the result)
